@@ -10,7 +10,7 @@
   (testing "Match a given state and code to a certain provider."
     (with-redefs [providers (atom tf/final-several-providers-data)]  
       (match-code-to-provider tf/code-params)
-      (is (= (:code tf/code-params) @(:code ((keyword tf/test-state-value)  @providers)))))))
+      (is (= (:code tf/code-params) @(:code (:example @providers)))))))
 
 (deftest test-create-form-params
   (testing "Creation of query parameter map to include in http body."

@@ -3,7 +3,6 @@
 
 (def test-state-value "34fFs29kd09")
 
-(def test-state-value-keyword (keyword test-state-value)) 
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
 (def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
@@ -112,22 +111,22 @@
   (assoc (dissoc final-provider-data [:expires_in :refresh_token]) :access_token (ref (str (:access_token final-provider-data) "c"))))
 
 (def several-providers-data
-  {test-state-value-keyword provider-data})
+  {:example provider-data})
 
 (def final-several-providers-data
-  {test-state-value-keyword final-provider-data})
+  {:example final-provider-data})
 
 (def final-several-providers-data-no-optionals
-  {test-state-value-keyword final-provider-data-no-optionals})
+  {:example final-provider-data-no-optionals})
 
 (defn reset
   "Reset the state a of our app before calling test f."
   [f]
   (f)
-   (dosync
-        (ref-set (:access_token provider-data) nil)  
-        (ref-set (:refresh_token provider-data) nil)  
-        (ref-set (:expires_in provider-data) nil)))
+  (dosync
+    (ref-set (:access_token provider-data) nil)  
+    (ref-set (:refresh_token provider-data) nil)  
+    (ref-set (:expires_in provider-data) nil)))
 
 (defn test-uuid
   "Always return the same uuid for testin purposes."

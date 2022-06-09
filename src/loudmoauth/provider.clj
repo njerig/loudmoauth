@@ -27,6 +27,10 @@
 
 (def query-params [:client-id :response-type :redirect-uri :scope :state])
 
+(defn get-provider-from-state
+  [state m]
+  (some #(if (= (:state %) state) %) (vals m)))
+
 (defn provider-reverse-lookup
   "Performs a reverse look up on provider value and returns the first result found."
   [provider m]
@@ -35,10 +39,10 @@
 (defn query-param-string 
   "Get query-param string from query parameter map."
   [provider-data]
-  (->>
-    (:custom-query-params provider-data) (merge (select-keys provider-data query-params))
-    (util/change-keys)
-    (client/generate-query-string)))
+  (->> (:custom-query-params provider-data)
+       (merge (select-keys provider-data query-params))
+       (util/change-keys)
+       (client/generate-query-string)))
 
 (defn auth-url
   "Build the authorization url."
@@ -53,14 +57,14 @@
 (defn build-provider
   [provider-data]
   (let [rtype "code" state (util/uuid)]
-  {:code (promise)
-   :expires_in (ref nil)
-   :refresh_token (ref nil)
-   :access_token (ref nil)
-   :state state
-   :response-type rtype
-   :auth-url (auth-url (merge provider-data {:response-type rtype :state state}))
-   :token-url (token-url provider-data)}))
+    {:code (promise)
+     :expires_in (ref nil)
+     :refresh_token (ref nil)
+     :access_token (ref nil)
+     :state state
+     :response-type rtype
+     :auth-url (auth-url (merge provider-data {:response-type rtype :state state}))
+     :token-url (token-url provider-data)}))
 
 (defn create-new-provider
   [new-provider-data]

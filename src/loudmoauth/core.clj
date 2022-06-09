@@ -2,28 +2,24 @@
   (:require [loudmoauth.authflow :as lma]
             [loudmoauth.provider :as p])) 
 
-;Use channel here? Calling a function like this is so nesting.
 (defn parse-params
-  "Parse parameters from http-response and put on channel."
+  "Parse parameters in URL from the OAuth 2 server HTTP response."
   [response]
-    (->>
-      response 
-      :params
-      (lma/match-code-to-provider)))
+  (->> response 
+       :params
+       (lma/match-code-to-provider)))
 
 ;Reverser match on provider name instead of state
 (defn refresh-token
-  "In case of emergency token refresh, call this function with provider keyword to update
+  "In case the token refresher doesn't work, call this function with provider keyword to update
   a specific provider, calling it without arguments tries to update all keys."
   ([provider]
-   (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
+   (let [provider-data (provider @lma/providers)]
      (if @(:refresh_token provider-data)
-       (->>
-         (lma/get-tokens provider-data)
-         (lma/add-to-providers))
-       (->>
-         (merge provider-data {:code (promise)})
-         (lma/init-and-add-provider)))))) 
+       (->> (lma/get-tokens provider-data)
+            (lma/add-to-providers))
+       (->> (merge provider-data {:code (promise)})
+            (lma/init-and-add-provider)))))) 
 
 (defn user-interaction
   "Returns user interaction url if present, nil if not."
@@ -37,18 +33,23 @@
   [provider-params]
     (lma/init-and-add-provider (p/create-new-provider provider-params)))
 
+(defn logout-provider
+  "Removes token data from provider and changes state."
+  [provider]
+  (let [provider-data (provider @lma/providers)
+        provider-data-sans-tokens (merge provider-data (p/build-provider provider-data))]
+    (lma/init-and-add-provider provider-data-sans-tokens)))
+
 ;What if we delete a provider that's in the middle of updating?
 (defn delete-provider
   "Remove provider and token data."
   [provider]
-  (let [provider-data (p/provider-reverse-lookup provider @lma/providers)
-        state (keyword (:state provider-data))]
-    (swap! lma/providers dissoc @lma/providers state)))
+  (swap! lma/providers dissoc provider))
 
-;Reverser match on provider name instead of state
-;Here we either supply our key or don't. If no key, just return (first tokens)
 (defn oauth-token
-  "Retreive oauth token for use in authentication call"
+  "Retrieve oauth token for use in authentication call. Returns nil if the authentication process hasn't started."
   [provider]
-  (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
-    @(:access_token provider-data)))
+  (let [provider-data (provider @lma/providers)]
+    (if-let [access-token @(:access_token provider-data)]
+      access-token
+      nil)))

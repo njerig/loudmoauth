@@ -75,6 +75,12 @@ When a new provider is added to the client a separate thread will try to retriev
 (lmoauth/refresh-token :spotify)
 ```
 
+### "Logging out" from a provider
+If you're using an authentication library (like buddy) and need to be able to delete tokens from the provider without deleting the whole provider, you can call `logout-provider`.
+```Clojure
+(lmoauth/logout-provider :spotify)
+```
+
 ### Removing a provider 
 To remove a provider call the `delete-provider` function with the provider keyword as an argument.
 ```Clojure

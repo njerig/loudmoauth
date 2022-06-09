@@ -11,7 +11,7 @@
 (deftest test-parse-params
   (testing "Test parsing of :code and :state in incoming request params."
     (with-redefs [lma/providers (atom tf/final-several-providers-data)]  
-      (deliver (:code (tf/test-state-value-keyword tf/final-several-providers-data)) "abcdefghijklmn123456789")
+      (deliver (:code (:example tf/final-several-providers-data)) "abcdefghijklmn123456789")
       (parse-params tf/test-code-http-response)
       (is (= @(:code tf/final-provider-data) @(:code (p/provider-reverse-lookup :example @lma/providers)))))))
 

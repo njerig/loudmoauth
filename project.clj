@@ -1,10 +1,10 @@
-(defproject loudmoauth "0.1.3"
+(defproject org.clojars.njerig/loudmoauth "0.1.4"
   :description "A single user multi provider oauth2 client library."
-  :url "http://github.com/blmstrm/loudmoauth"
+  :url "http://github.com/njerig/loudmoauth"
   :license {:name "The MIT License (MIT)"
             :url "http://opensource.org/licenses/MIT"}
   :plugins [[lein-cloverage "1.0.6"]]
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.clojure/data.codec "0.1.0"]
                  [org.clojure/data.json "0.2.6"]
                  [clj-http "3.1.0"]

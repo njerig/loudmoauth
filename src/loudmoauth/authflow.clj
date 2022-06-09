@@ -1,7 +1,8 @@
 (ns loudmoauth.authflow
   (:require [loudmoauth.util :as lmutil]
             [clojure.string :as str]
-            [clj-http.client :as client]))
+            [clj-http.client :as client]
+            [loudmoauth.provider :as p]))
 
 (def providers (atom {}))
 
@@ -9,9 +10,9 @@
 
 (defn match-code-to-provider
   [params]
-  (let [state (keyword (:state params))
+  (let [state (:state params)
         code (:code params)
-        current-provider-data (state @providers)]
+        current-provider-data (p/get-provider-from-state state @providers)]
     (deliver (:code current-provider-data) code)))
 
 (defn create-form-params
@@ -19,8 +20,7 @@
   [provider-data]
   (merge
     {:client_id (:client-id provider-data)
-     :client_secret (:client-secret provider-data)
-     }
+     :client_secret (:client-secret provider-data)}
     (if @(:refresh_token provider-data)
       {:grant_type "refresh_token"
        :refresh_token @(:refresh_token provider-data)}
@@ -62,32 +62,28 @@
   [provider-data]
   (when-let [token-refresher (:token-refresher provider-data)]
     (future-cancel token-refresher))
-  (if-let [expiry-time (:expires_in provider-data)]
-    (assoc provider-data :token-refresher (token-refresher expiry-time provider-data)))
-    provider-data)
+  (if-let [expiry-time @(:expires_in provider-data)]
+    (swap! providers assoc-in [(:provider provider-data) :token-refresher] (token-refresher expiry-time provider-data))))
 
 (defn http-post-for-tokens
   [provider-data]
   "Wrapper around http client post call."
-    (client/post (:token-url provider-data) (create-query-data provider-data)))
+  (client/post (:token-url provider-data) (create-query-data provider-data)))
 
 (defn get-tokens
   "Fetch tokens using crafted url" 
   [provider-data]
-  (->>
-    (http-post-for-tokens provider-data)
-    (assoc provider-data :token-response)
-    (parse-tokens!))
+  (->> (http-post-for-tokens provider-data)
+       (swap! providers assoc-in [(:provider provider-data) :token-response])
+       (parse-tokens!))
   (launch-token-refresher provider-data))
 
 (defn add-to-providers
   [provider-data]
-  (swap! providers merge @providers {(keyword (:state provider-data)) provider-data}))
+  (swap! providers merge {(:provider provider-data) provider-data}))
 
 (defn init-and-add-provider
   [provider-data]
   (future
-  (add-to-providers provider-data)
-  (->>
-    provider-data
-    (get-tokens))))
+    (add-to-providers provider-data)
+    (get-tokens provider-data)))
