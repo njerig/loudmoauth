@@ -1,4 +1,4 @@
-(defproject org.clojars.njerig/loudmoauth "0.1.4"
+(defproject org.clojars.njerig/loudmoauth "0.2.0"
   :description "A single user multi provider oauth2 client library."
   :url "http://github.com/njerig/loudmoauth"
   :license {:name "The MIT License (MIT)"
