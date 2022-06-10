@@ -54,7 +54,7 @@
 (defn token-refresher
   "Starts a call to get-tokens in s seconds, continues forever until cancelled."
   [s provider-data]
-  (future (while true (do (Thread/sleep s) (get-tokens provider-data)))))
+  (future (while true (do (Thread/sleep (* s 1000)) (get-tokens provider-data)))))
 
 ;TODO - What if when and if-let below all resolve to false? We will break our function chain.
 (defn launch-token-refresher
@@ -62,8 +62,9 @@
   [provider-data]
   (when-let [token-refresher (:token-refresher provider-data)]
     (future-cancel token-refresher))
-  (if-let [expiry-time @(:expires_in provider-data)]
-    (swap! providers assoc-in [(:provider provider-data) :token-refresher] (token-refresher expiry-time provider-data))))
+  (if-let [expiry-time-ref (:expires_in provider-data)]
+    (swap! providers assoc-in [(:provider provider-data) :token-refresher] (token-refresher @expiry-time-ref provider-data)))
+  provider-data)
 
 (defn http-post-for-tokens
   [provider-data]
@@ -74,7 +75,7 @@
   "Fetch tokens using crafted url" 
   [provider-data]
   (->> (http-post-for-tokens provider-data)
-       (swap! providers assoc-in [(:provider provider-data) :token-response])
+       (assoc provider-data :token-response)
        (parse-tokens!))
   (launch-token-refresher provider-data))
 

@@ -47,9 +47,10 @@
   (swap! lma/providers dissoc provider))
 
 (defn oauth-token
-  "Retrieve oauth token for use in authentication call. Returns nil if the authentication process hasn't started."
+  "Retrieve oauth token for use in authentication call. Returns nil if the 
+  authentication process hasn't started."
   [provider]
   (let [provider-data (provider @lma/providers)]
-    (if-let [access-token @(:access_token provider-data)]
-      access-token
+    (if-let [access-token-ref (:access_token provider-data)]
+      @access-token-ref
       nil)))

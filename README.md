@@ -1,12 +1,10 @@
-[![Build Status](https://travis-ci.org/blmstrm/loudmoauth.svg?branch=master)](https://travis-ci.org/blmstrm/loudmoauth)
-[![Clojars](https://img.shields.io/clojars/v/loudmoauth.svg)](http://clojars.org/loudmoauth)
-[![Coverage Status](https://coveralls.io/repos/github/blmstrm/loudmoauth/badge.svg?branch=master)](https://coveralls.io/github/blmstrm/loudmoauth?branch=master)
-[![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.njerig/loudmoauth.svg)](https://clojars.org/org.clojars.njerig/loudmoauth)
+
 # Loudmoauth
 Loudmoauth is a single user multi provider oauth2 client library. It's been built with single user access to several different providers as its main focus.
 
 ## Quickstart
-To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.1"]`.
+To use `loudmoauth` with Leiningen or Boot include `[org.clojars.njerig/loudmoauth "0.2.1"]`.
 
 Require `loudmoauth` in your application:
 ```Clojure
