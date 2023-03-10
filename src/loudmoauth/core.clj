@@ -51,6 +51,6 @@
   authentication process hasn't started."
   [provider]
   (let [provider-data (provider @lma/providers)]
-    (if-let [access-token-ref (:access_token provider-data)]
-      @access-token-ref
+    (if-let [access-token @(:access_token provider-data)]
+      access-token
       nil)))
